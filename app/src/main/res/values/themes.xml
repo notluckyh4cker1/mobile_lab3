@@ -1,0 +1,73 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MathMaster" parent="Theme.Material3.DayNight">
+        <!-- Явно отключаем ActionBar -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <!-- Primary colors -->
+        <item name="colorPrimary">@color/primary_light</item>
+        <item name="colorOnPrimary">@color/on_primary_light</item>
+        <item name="colorPrimaryContainer">@color/primary_container_light</item>
+        <item name="colorOnPrimaryContainer">@color/on_primary_container_light</item>
+
+        <!-- Secondary colors -->
+        <item name="colorSecondary">@color/secondary_light</item>
+        <item name="colorOnSecondary">@color/on_secondary_light</item>
+        <item name="colorSecondaryContainer">@color/secondary_container_light</item>
+        <item name="colorOnSecondaryContainer">@color/on_secondary_container_light</item>
+
+        <!-- Background and surface colors -->
+        <item name="android:colorBackground">@color/background_light</item>
+        <item name="colorOnBackground">@color/on_background_light</item>
+        <item name="colorSurface">@color/surface_light</item>
+        <item name="colorOnSurface">@color/on_surface_light</item>
+        <item name="colorSurfaceVariant">@color/surface_variant_light</item>
+        <item name="colorOnSurfaceVariant">@color/on_surface_variant_light</item>
+
+        <!-- Toolbar styling -->
+        <item name="toolbarStyle">@style/Widget.MathMaster.Toolbar</item>
+    </style>
+
+    <style name="Theme.MathMaster" parent="Base.Theme.MathMaster" />
+
+    <!-- Custom Toolbar Style -->
+    <style name="Widget.MathMaster.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="titleTextColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <!-- Calculator Button Styles -->
+    <style name="Button.Calculator.Number" parent="Widget.Material3.Button">
+        <item name="backgroundTint">?attr/colorSurfaceVariant</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+        <item name="cornerRadius">24dp</item>
+        <item name="android:minHeight">64dp</item>
+        <item name="android:minWidth">64dp</item>
+    </style>
+
+    <style name="Button.Calculator.Operation" parent="Widget.Material3.Button">
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="cornerRadius">24dp</item>
+        <item name="android:minHeight">64dp</item>
+        <item name="android:minWidth">64dp</item>
+    </style>
+
+    <style name="Button.Calculator.Function" parent="Widget.Material3.Button">
+        <item name="backgroundTint">?attr/colorSurfaceVariant</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+        <item name="cornerRadius">24dp</item>
+        <item name="android:minHeight">64dp</item>
+        <item name="android:minWidth">64dp</item>
+    </style>
+
+    <style name="Button.Calculator.Equals" parent="Widget.Material3.Button">
+        <item name="backgroundTint">?attr/colorSecondary</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="cornerRadius">24dp</item>
+        <item name="android:minHeight">64dp</item>
+        <item name="android:minWidth">64dp</item>
+        <item name="elevation">4dp</item>
+    </style>
+</resources>

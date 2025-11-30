@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">MathMaster</string>
+
+    <!-- Navigation -->
+    <string name="calculator">Калькулятор</string>
+    <string name="graphs">Графики</string>
+    <string name="history">История</string>
+
+    <!-- Buttons -->
+    <string name="history_button">История</string>
+    <string name="engineering_button">Инженерный</string>
+    <string name="programmer_button">Программист</string>
+    <string name="plot_button">Построить</string>
+    <string name="clear_button">Очистить</string>
+    <string name="save_settings">Сохранить настройки</string>
+    <string name="back">Назад</string>
+
+    <!-- Calculator -->
+    <string name="enter_function">Введите функцию...</string>
+    <string name="color">Цвет:</string>
+    <string name="red">Красный</string>
+    <string name="purple">Фиолетовый</string>
+    <string name="orange">Оранжевый</string>
+    <string name="green">Зеленый</string>
+    <string name="blue">Синий</string>
+    <string name="magenta">Пурпурный</string>
+
+    <!-- Settings -->
+    <string name="settings">Настройки</string>
+    <string name="app_theme">Тема приложения:</string>
+    <string name="light_theme">Светлая</string>
+    <string name="dark_theme">Темная</string>
+    <string name="system_theme">Системная</string>
+    <string name="language">Язык:</string>
+    <string name="russian">Русский</string>
+    <string name="english">English</string>
+    <string name="system_language">Системный</string>
+    <string name="save_settings_button">Сохранить настройки</string>
+
+    <!-- History -->
+    <string name="clear_history">Очистить историю</string>
+    <string name="empty_history">История пуста</string>
+    <string name="graph_history">График: %s</string>
+    <string name="click_to_plot">Нажмите для построения</string>
+
+    <string name="delete">Удалить</string>
+    <string name="history_empty">История пуста</string>
+
+    <!-- Messages -->
+    <string name="settings_saved">Настройки сохранены</string>
+    <string name="invalid_function">Некорректная функция. Используйте x как переменную</string>
+</resources>
