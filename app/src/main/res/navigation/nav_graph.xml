@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/calculatorFragment">
+
+    <fragment
+        android:id="@+id/calculatorFragment"
+        android:name="com.example.mathmaster.ui.calculator.CalculatorFragment"
+        tools:layout="@layout/fragment_calculator">
+
+        <argument
+            android:name="expressionFromHistory"
+            android:defaultValue=""
+            app:argType="string" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/graphsFragment"
+        android:name="com.example.mathmaster.ui.graphs.GraphFragment"
+        tools:layout="@layout/fragment_graph" />
+
+    <fragment
+        android:id="@+id/programmerFragment"
+        android:name="com.example.mathmaster.ui.calculator.ProgrammerFragment"
+        tools:layout="@layout/fragment_programmer">
+
+        <argument
+            android:name="expressionFromHistory"
+            android:defaultValue=""
+            app:argType="string" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.example.mathmaster.ui.history.HistoryFragment"
+        tools:layout="@layout/fragment_history">
+
+        <action
+            android:id="@+id/action_historyFragment_to_calculatorFragment"
+            app:destination="@id/calculatorFragment" />
+
+        <action
+            android:id="@+id/action_historyFragment_to_programmerFragment"
+            app:destination="@id/programmerFragment" />
+
+        <action
+            android:id="@+id/action_historyFragment_to_graphsFragment"
+            app:destination="@id/graphsFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.mathmaster.ui.settings.SettingsFragment"
+        tools:layout="@layout/fragment_settings" />
+
+</navigation>
