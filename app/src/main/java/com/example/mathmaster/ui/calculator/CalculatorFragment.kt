@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.mathmaster.database.AppDatabase
 import com.example.mathmaster.repository.CalculatorRepository
-import com.example.mathmaster.ui.history.HistoryViewModel
 import com.example.mathmaster.databinding.FragmentCalculatorBinding
 import kotlin.math.*
 
@@ -17,6 +17,7 @@ class CalculatorFragment : Fragment() {
 
     private var currentExpression = "0"
     private var currentResult = "0"
+    private var isFromHistory = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,18 +28,16 @@ class CalculatorFragment : Fragment() {
         return binding.root
     }
 
-    private lateinit var historyViewModel: HistoryViewModel
-    private var isFromHistory = false
+    private var wasFromHistory = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val database = AppDatabase.getDatabase(requireContext())
-        val repository = CalculatorRepository(database.calculationHistoryDao())
-        historyViewModel = HistoryViewModel(repository)
-
+        val fromHistory = arguments?.getBoolean("fromHistory", false) ?: false
+        wasFromHistory = fromHistory
         val expressionFromHistory = arguments?.getString("expressionFromHistory")
-        if (!expressionFromHistory.isNullOrEmpty()) {
+
+        if (fromHistory && !expressionFromHistory.isNullOrEmpty()) {
             currentExpression = expressionFromHistory
             isFromHistory = true
             calculateFromHistory()
@@ -48,8 +47,17 @@ class CalculatorFragment : Fragment() {
         updateDisplay()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        if (wasFromHistory) {
+            wasFromHistory = false
+            arguments?.clear()
+        }
+    }
+
     private fun setupClickListeners() {
-        // Numbers
+        // Цифры
         binding.button0.setOnClickListener { appendNumber("0") }
         binding.button1.setOnClickListener { appendNumber("1") }
         binding.button2.setOnClickListener { appendNumber("2") }
@@ -61,13 +69,13 @@ class CalculatorFragment : Fragment() {
         binding.button8.setOnClickListener { appendNumber("8") }
         binding.button9.setOnClickListener { appendNumber("9") }
 
-        // Basic Operations
+        // Базовые операции
         binding.buttonAdd.setOnClickListener { appendOperation("+") }
         binding.buttonSubtract.setOnClickListener { appendOperation("-") }
         binding.buttonMultiply.setOnClickListener { appendOperation("*") }
         binding.buttonDivide.setOnClickListener { appendOperation("/") }
 
-        // Functions
+        // Функции
         binding.buttonDecimal.setOnClickListener { appendDecimal() }
         binding.buttonOpenBracket.setOnClickListener { appendOperation("(") }
         binding.buttonCloseBracket.setOnClickListener { appendOperation(")") }
@@ -75,7 +83,7 @@ class CalculatorFragment : Fragment() {
         binding.buttonEquals.setOnClickListener { calculate() }
         binding.buttonDelete.setOnClickListener { deleteLast() }
 
-        // Scientific Functions
+        // Функции sin, cos, tg,..
         binding.buttonSin.setOnClickListener { appendTrigFunction("sin(") }
         binding.buttonCos.setOnClickListener { appendTrigFunction("cos(") }
         binding.buttonTan.setOnClickListener { appendTrigFunction("tan(") }
@@ -156,6 +164,14 @@ class CalculatorFragment : Fragment() {
         }
     }
 
+    private fun saveToHistory(expression: String, result: String, type: String) {
+        viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+            val database = AppDatabase.getDatabase(requireContext())
+            val repository = CalculatorRepository(database.calculationHistoryDao())
+            repository.insertHistory(expression, result, type)
+        }
+    }
+
     private fun calculate() {
         try {
             val result = evaluateExpression(currentExpression)
@@ -163,11 +179,7 @@ class CalculatorFragment : Fragment() {
             updateDisplay()
 
             if (result != "Error") {
-                historyViewModel.saveCalculation(
-                    expression = currentExpression,
-                    result = result,
-                    calculatorType = "engineering"
-                )
+                saveToHistory(currentExpression, result, "engineering")
             }
 
         } catch (e: Exception) {

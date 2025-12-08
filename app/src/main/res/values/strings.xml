@@ -5,8 +5,10 @@
 
     <!-- Navigation -->
     <string name="calculator">Калькулятор</string>
+    <string name="programmer">Программист</string>
     <string name="graphs">Графики</string>
     <string name="history">История</string>
+    <string name="settings">Настройки</string>
 
     <!-- Buttons -->
     <string name="history_button">История</string>
@@ -27,8 +29,13 @@
     <string name="blue">Синий</string>
     <string name="magenta">Пурпурный</string>
 
+    <!-- Graph -->
+    <string name="graph_title">Построитель графиков</string>
+    <string name="graph_subtitle">Визуализация математических функций</string>
+    <string name="range">Диапазон:</string>
+    <string name="graph_settings">Настройки графика</string>
+
     <!-- Settings -->
-    <string name="settings">Настройки</string>
     <string name="app_theme">Тема приложения:</string>
     <string name="light_theme">Светлая</string>
     <string name="dark_theme">Темная</string>
@@ -41,14 +48,17 @@
 
     <!-- History -->
     <string name="clear_history">Очистить историю</string>
-    <string name="empty_history">История пуста</string>
+    <string name="history_empty">История пуста</string>
+    <string name="history_empty_title">Нет вычислений</string>
+    <string name="history_empty_subtitle">Ваша история вычислений появится здесь</string>
     <string name="graph_history">График: %s</string>
     <string name="click_to_plot">Нажмите для построения</string>
-
+    <string name="total_calculations">Всего вычислений:</string>
     <string name="delete">Удалить</string>
-    <string name="history_empty">История пуста</string>
 
     <!-- Messages -->
     <string name="settings_saved">Настройки сохранены</string>
     <string name="invalid_function">Некорректная функция. Используйте x как переменную</string>
+    <string name="error">Ошибка</string>
+    <string name="success">Успешно</string>
 </resources>

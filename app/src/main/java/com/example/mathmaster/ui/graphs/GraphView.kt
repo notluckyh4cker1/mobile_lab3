@@ -6,7 +6,11 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
+import kotlin.math.max
 
 class GraphView @JvmOverloads constructor(
     context: Context,
@@ -15,16 +19,16 @@ class GraphView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val axisPaint = Paint().apply {
-        color = Color.parseColor("#49454F")
+        color = Color.parseColor("#000000")
         strokeWidth = 3f
         isAntiAlias = true
     }
     private val gridPaint = Paint().apply {
-        color = Color.parseColor("#E7E0EC")
+        color = Color.parseColor("#E0E0E0")
         strokeWidth = 1f
     }
     private val textPaint = Paint().apply {
-        color = Color.parseColor("#49454F")
+        color = Color.parseColor("#000000")
         textSize = 24f
         isAntiAlias = true
     }
@@ -36,7 +40,23 @@ class GraphView @JvmOverloads constructor(
     }
 
     private var functions: List<Pair<String, Int>> = emptyList()
-    private val scale = 50f // pixels per unit
+
+    private var scale = 50f // pixels per unit
+    private var offsetX = 0f
+    private var offsetY = 0f
+
+    private val gestureDetector: GestureDetector
+    private val scaleGestureDetector: ScaleGestureDetector
+
+    init {
+        gestureDetector = GestureDetector(context, GestureListener())
+        scaleGestureDetector = ScaleGestureDetector(context, ScaleListener())
+
+        val density = context.resources.displayMetrics.density
+        scale = max(scale, 20f * density)
+
+        setBackgroundColor(Color.WHITE)
+    }
 
     fun plotFunction(function: String, color: Int) {
         functions = functions + (function to color)
@@ -45,14 +65,23 @@ class GraphView @JvmOverloads constructor(
 
     fun clearGraph() {
         functions = emptyList()
+        scale = 50f
+        offsetX = 0f
+        offsetY = 0f
         invalidate()
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        scaleGestureDetector.onTouchEvent(event)
+        gestureDetector.onTouchEvent(event)
+        return true
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val centerX = width / 2f
-        val centerY = height / 2f
+        val centerX = width / 2f + offsetX
+        val centerY = height / 2f + offsetY
 
         drawGrid(canvas, centerX, centerY)
         drawAxes(canvas, centerX, centerY)
@@ -61,12 +90,17 @@ class GraphView @JvmOverloads constructor(
     }
 
     private fun drawGrid(canvas: Canvas, centerX: Float, centerY: Float) {
-        for (x in -8..8) {
+        val startX = -((centerX) / scale).toInt() - 1
+        val endX = ((width - centerX) / scale).toInt() + 1
+        val startY = -((height - centerY) / scale).toInt() - 1
+        val endY = ((centerY) / scale).toInt() + 1
+
+        for (x in startX..endX) {
             val screenX = centerX + x * scale
             canvas.drawLine(screenX, 0f, screenX, height.toFloat(), gridPaint)
         }
 
-        for (y in -7..7) {
+        for (y in startY..endY) {
             val screenY = centerY - y * scale
             canvas.drawLine(0f, screenY, width.toFloat(), screenY, gridPaint)
         }
@@ -75,22 +109,62 @@ class GraphView @JvmOverloads constructor(
     private fun drawAxes(canvas: Canvas, centerX: Float, centerY: Float) {
         canvas.drawLine(0f, centerY, width.toFloat(), centerY, axisPaint)
         canvas.drawLine(centerX, 0f, centerX, height.toFloat(), axisPaint)
+
+        val arrowSize = 10f
+
+        canvas.drawLine(
+            width.toFloat(), centerY,
+            width.toFloat() - arrowSize, centerY - arrowSize,
+            axisPaint
+        )
+        canvas.drawLine(
+            width.toFloat(), centerY,
+            width.toFloat() - arrowSize, centerY + arrowSize,
+            axisPaint
+        )
+
+        canvas.drawLine(
+            centerX, 0f,
+            centerX - arrowSize, arrowSize,
+            axisPaint
+        )
+        canvas.drawLine(
+            centerX, 0f,
+            centerX + arrowSize, arrowSize,
+            axisPaint
+        )
     }
 
     private fun drawLabels(canvas: Canvas, centerX: Float, centerY: Float) {
-        for (x in -8..8) {
+        val labelStep = max(1, (scale / 30).toInt()) // Adjust label density based on zoom
+
+        val startX = -((centerX) / scale).toInt() - 1
+        val endX = ((width - centerX) / scale).toInt() + 1
+        val startY = -((height - centerY) / scale).toInt() - 1
+        val endY = ((centerY) / scale).toInt() + 1
+
+        for (x in startX..endX step labelStep) {
             if (x == 0) continue
             val screenX = centerX + x * scale
-            canvas.drawText(x.toString(), screenX - 8, centerY + 30, textPaint)
+            if (screenX in 40f..(width - 40f)) {
+                canvas.drawText(x.toString(), screenX - 10, centerY + 35, textPaint)
+                canvas.drawLine(screenX, centerY - 5, screenX, centerY + 5, axisPaint)
+            }
         }
 
-        for (y in -7..7) {
+        for (y in startY..endY step labelStep) {
             if (y == 0) continue
             val screenY = centerY - y * scale
-            canvas.drawText(y.toString(), centerX + 10, screenY + 8, textPaint)
+            if (screenY in 40f..(height - 40f)) {
+                canvas.drawText(y.toString(), centerX + 15, screenY + 10, textPaint)
+                canvas.drawLine(centerX - 5, screenY, centerX + 5, screenY, axisPaint)
+            }
         }
 
-        canvas.drawText("0", centerX + 5, centerY + 30, textPaint)
+        // Ноль в центре
+        if (centerX in 40f..(width - 40f) && centerY in 40f..(height - 40f)) {
+            canvas.drawText("0", centerX + 10, centerY + 35, textPaint)
+        }
     }
 
     private fun drawFunctions(canvas: Canvas, centerX: Float, centerY: Float) {
@@ -140,29 +214,44 @@ class GraphView @JvmOverloads constructor(
         }
     }
 
-    private fun evalSimpleExpression(expr: String): Double {
-        return when {
-            expr.contains("+") -> {
-                val parts = expr.split("+")
-                evalSimpleExpression(parts[0]) + evalSimpleExpression(parts[1])
+    private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
+        override fun onScroll(
+            e1: MotionEvent?,
+            e2: MotionEvent,
+            distanceX: Float,
+            distanceY: Float
+        ): Boolean {
+            if (!scaleGestureDetector.isInProgress) {
+                offsetX -= distanceX
+                offsetY -= distanceY
+                invalidate()
+                return true
             }
-            expr.contains("-") -> {
-                val parts = expr.split("-")
-                evalSimpleExpression(parts[0]) - evalSimpleExpression(parts[1])
+            return false
+        }
+    }
+
+    private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+        override fun onScale(detector: ScaleGestureDetector): Boolean {
+            val scaleFactor = detector.scaleFactor
+            val newScale = scale * scaleFactor
+
+            val density = context.resources.displayMetrics.density
+            val minScale = 10f * density
+            val maxScale = 200f * density
+
+            if (newScale in minScale..maxScale) {
+                val focusX = detector.focusX
+                val focusY = detector.focusY
+
+                offsetX = focusX - (focusX - offsetX) * scaleFactor
+                offsetY = focusY - (focusY - offsetY) * scaleFactor
+
+                scale = newScale
+                invalidate()
+                return true
             }
-            expr.contains("*") -> {
-                val parts = expr.split("*")
-                evalSimpleExpression(parts[0]) * evalSimpleExpression(parts[1])
-            }
-            expr.contains("/") -> {
-                val parts = expr.split("/")
-                evalSimpleExpression(parts[0]) / evalSimpleExpression(parts[1])
-            }
-            expr.contains("^") -> {
-                val parts = expr.split("^")
-                Math.pow(evalSimpleExpression(parts[0]), evalSimpleExpression(parts[1]))
-            }
-            else -> expr.toDoubleOrNull() ?: Double.NaN
+            return false
         }
     }
 }

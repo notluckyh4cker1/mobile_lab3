@@ -5,8 +5,10 @@
 
     <!-- Navigation -->
     <string name="calculator">Calculator</string>
+    <string name="programmer">Programmer</string>
     <string name="graphs">Graphs</string>
     <string name="history">History</string>
+    <string name="settings">Settings</string>
 
     <!-- Buttons -->
     <string name="history_button">History</string>
@@ -27,8 +29,13 @@
     <string name="blue">Blue</string>
     <string name="magenta">Magenta</string>
 
+    <!-- Graph -->
+    <string name="graph_title">Function Grapher</string>
+    <string name="graph_subtitle">Visualize mathematical functions</string>
+    <string name="range">Range:</string>
+    <string name="graph_settings">Graph Settings</string>
+
     <!-- Settings -->
-    <string name="settings">Settings</string>
     <string name="app_theme">App Theme:</string>
     <string name="light_theme">Light</string>
     <string name="dark_theme">Dark</string>
@@ -41,14 +48,17 @@
 
     <!-- History -->
     <string name="clear_history">Clear History</string>
-    <string name="empty_history">No history yet</string>
+    <string name="history_empty">History is empty</string>
+    <string name="history_empty_title">No calculations yet</string>
+    <string name="history_empty_subtitle">Your calculation history will appear here</string>
     <string name="graph_history">Graph: %s</string>
     <string name="click_to_plot">Click to plot</string>
-
+    <string name="total_calculations">Total Calculations:</string>
     <string name="delete">Delete</string>
-    <string name="history_empty">History is empty</string>
 
     <!-- Messages -->
     <string name="settings_saved">Settings saved</string>
     <string name="invalid_function">Invalid function. Use x as variable</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
 </resources>
