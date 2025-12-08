@@ -11,7 +11,6 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import kotlin.math.max
-import kotlin.math.min
 
 class GraphView @JvmOverloads constructor(
     context: Context,
@@ -19,18 +18,17 @@ class GraphView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    // Всегда белый фон для плоскости
     private val axisPaint = Paint().apply {
-        color = Color.parseColor("#000000") // Черные оси всегда
+        color = Color.parseColor("#000000")
         strokeWidth = 3f
         isAntiAlias = true
     }
     private val gridPaint = Paint().apply {
-        color = Color.parseColor("#E0E0E0") // Светло-серые линии сетки
+        color = Color.parseColor("#E0E0E0")
         strokeWidth = 1f
     }
     private val textPaint = Paint().apply {
-        color = Color.parseColor("#000000") // Черные цифры всегда
+        color = Color.parseColor("#000000")
         textSize = 24f
         isAntiAlias = true
     }
@@ -43,12 +41,10 @@ class GraphView @JvmOverloads constructor(
 
     private var functions: List<Pair<String, Int>> = emptyList()
 
-    // Camera/View properties
     private var scale = 50f // pixels per unit
     private var offsetX = 0f
     private var offsetY = 0f
 
-    // Gesture detectors
     private val gestureDetector: GestureDetector
     private val scaleGestureDetector: ScaleGestureDetector
 
@@ -56,11 +52,9 @@ class GraphView @JvmOverloads constructor(
         gestureDetector = GestureDetector(context, GestureListener())
         scaleGestureDetector = ScaleGestureDetector(context, ScaleListener())
 
-        // Set minimum scale
         val density = context.resources.displayMetrics.density
         scale = max(scale, 20f * density)
 
-        // Устанавливаем белый фон
         setBackgroundColor(Color.WHITE)
     }
 
@@ -71,7 +65,6 @@ class GraphView @JvmOverloads constructor(
 
     fun clearGraph() {
         functions = emptyList()
-        // Reset view
         scale = 50f
         offsetX = 0f
         offsetY = 0f
@@ -97,7 +90,6 @@ class GraphView @JvmOverloads constructor(
     }
 
     private fun drawGrid(canvas: Canvas, centerX: Float, centerY: Float) {
-        // Calculate visible grid lines
         val startX = -((centerX) / scale).toInt() - 1
         val endX = ((width - centerX) / scale).toInt() + 1
         val startY = -((height - centerY) / scale).toInt() - 1
@@ -118,10 +110,8 @@ class GraphView @JvmOverloads constructor(
         canvas.drawLine(0f, centerY, width.toFloat(), centerY, axisPaint)
         canvas.drawLine(centerX, 0f, centerX, height.toFloat(), axisPaint)
 
-        // Стрелки на осях
         val arrowSize = 10f
 
-        // Стрелка на оси X
         canvas.drawLine(
             width.toFloat(), centerY,
             width.toFloat() - arrowSize, centerY - arrowSize,
@@ -133,7 +123,6 @@ class GraphView @JvmOverloads constructor(
             axisPaint
         )
 
-        // Стрелка на оси Y
         canvas.drawLine(
             centerX, 0f,
             centerX - arrowSize, arrowSize,
@@ -154,24 +143,20 @@ class GraphView @JvmOverloads constructor(
         val startY = -((height - centerY) / scale).toInt() - 1
         val endY = ((centerY) / scale).toInt() + 1
 
-        // Подписи на оси X
         for (x in startX..endX step labelStep) {
             if (x == 0) continue
             val screenX = centerX + x * scale
             if (screenX in 40f..(width - 40f)) {
                 canvas.drawText(x.toString(), screenX - 10, centerY + 35, textPaint)
-                // Маленькая отметка на оси
                 canvas.drawLine(screenX, centerY - 5, screenX, centerY + 5, axisPaint)
             }
         }
 
-        // Подписи на оси Y
         for (y in startY..endY step labelStep) {
             if (y == 0) continue
             val screenY = centerY - y * scale
             if (screenY in 40f..(height - 40f)) {
                 canvas.drawText(y.toString(), centerX + 15, screenY + 10, textPaint)
-                // Маленькая отметка на оси
                 canvas.drawLine(centerX - 5, screenY, centerX + 5, screenY, axisPaint)
             }
         }
@@ -229,7 +214,6 @@ class GraphView @JvmOverloads constructor(
         }
     }
 
-    // Gesture handling classes
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(
             e1: MotionEvent?,
@@ -252,7 +236,6 @@ class GraphView @JvmOverloads constructor(
             val scaleFactor = detector.scaleFactor
             val newScale = scale * scaleFactor
 
-            // Clamp scale between min and max values
             val density = context.resources.displayMetrics.density
             val minScale = 10f * density
             val maxScale = 200f * density
@@ -261,7 +244,6 @@ class GraphView @JvmOverloads constructor(
                 val focusX = detector.focusX
                 val focusY = detector.focusY
 
-                // Adjust offset to zoom around focal point
                 offsetX = focusX - (focusX - offsetX) * scaleFactor
                 offsetY = focusY - (focusY - offsetY) * scaleFactor
 

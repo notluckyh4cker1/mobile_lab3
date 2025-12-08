@@ -21,7 +21,7 @@ class ProgrammerFragment : Fragment() {
     private var currentInput = "0"
     private var currentExpression = "0"
     private var currentResult = "0"
-    private var currentBase = 10 // DEC по умолчанию
+    private var currentBase = 10
 
     // Для сохранения в историю
     private lateinit var repository: CalculatorRepository
@@ -38,28 +38,22 @@ class ProgrammerFragment : Fragment() {
 
     private var wasFromHistory = false
 
-    // В методе onViewCreated измените начало:
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Инициализируем репозиторий для истории
         val database = AppDatabase.getDatabase(requireContext())
         repository = CalculatorRepository(database.calculationHistoryDao())
 
-        // Получаем флаг fromHistory
         val fromHistory = arguments?.getBoolean("fromHistory", false) ?: false
         wasFromHistory = fromHistory
         val expressionFromHistory = arguments?.getString("expressionFromHistory")
 
-        // ПРОВЕРЯЕМ ПЕРЕДАННОЕ ВЫРАЖЕНИЕ ИЗ ИСТОРИИ ТОЛЬКО ЕСЛИ ФЛАГ УСТАНОВЛЕН
         if (fromHistory && !expressionFromHistory.isNullOrEmpty()) {
-            // ИЗВЛЕКАЕМ СИСТЕМУ СЧИСЛЕНИЯ И ВЫРАЖЕНИЕ
             val (cleanExpression, base) = extractExpressionAndBaseFromHistory(expressionFromHistory)
             currentInput = cleanExpression
             currentExpression = cleanExpression
-            currentBase = base // УСТАНАВЛИВАЕМ СИСТЕМУ СЧИСЛЕНИЯ ИЗ ИСТОРИИ
+            currentBase = base
 
-            // ВЫЧИСЛЯЕМ И ПОДСТАВЛЯЕМ РЕЗУЛЬТАТ
             calculateAndSetResultFromHistory()
         }
 
@@ -130,10 +124,8 @@ class ProgrammerFragment : Fragment() {
     }
 
     private fun updateBaseButtonHighlight() {
-        // Определяем, темная ли тема
         val isDarkTheme = isDarkTheme()
 
-        // Цвета для текста в зависимости от темы
         val unselectedTextColor = if (isDarkTheme) {
             ContextCompat.getColor(requireContext(), android.R.color.white)
         } else {
@@ -144,7 +136,6 @@ class ProgrammerFragment : Fragment() {
         val selectedTextColor = ContextCompat.getColor(requireContext(), android.R.color.white)
         val defaultBgColor = ContextCompat.getColor(requireContext(), android.R.color.transparent)
 
-        // Сбрасываем все кнопки систем счисления
         binding.buttonHex.setBackgroundColor(defaultBgColor)
         binding.buttonHex.setTextColor(unselectedTextColor)
 
@@ -157,7 +148,6 @@ class ProgrammerFragment : Fragment() {
         binding.buttonBin.setBackgroundColor(defaultBgColor)
         binding.buttonBin.setTextColor(unselectedTextColor)
 
-        // Подсвечиваем активную кнопку
         when (currentBase) {
             16 -> {
                 binding.buttonHex.setBackgroundColor(selectedBgColor)
@@ -208,7 +198,6 @@ class ProgrammerFragment : Fragment() {
     private fun changeBase(newBase: Int) {
         if (currentBase != newBase) {
             try {
-                // Конвертируем текущее число в новую систему счисления
                 val number = currentInput.toLongOrNull(currentBase) ?: 0
                 currentInput = when (newBase) {
                     2 -> number.toString(2)
@@ -217,7 +206,6 @@ class ProgrammerFragment : Fragment() {
                     16 -> number.toString(16).uppercase()
                     else -> number.toString(10)
                 }
-                // ОБНОВЛЯЕМ ВЫРАЖЕНИЕ ПРИ СМЕНЕ СИСТЕМЫ
                 currentExpression = currentInput
                 currentBase = newBase
                 updateButtonAvailability()
@@ -248,7 +236,6 @@ class ProgrammerFragment : Fragment() {
     }
 
     private fun updateButtonAvailability() {
-        // Обновляем доступность и прозрачность кнопок
         val digits = listOf(
             binding.button0, binding.button1, binding.button2, binding.button3,
             binding.button4, binding.button5, binding.button6, binding.button7,
@@ -307,10 +294,9 @@ class ProgrammerFragment : Fragment() {
     }
 
     private fun extractExpressionAndBaseFromHistory(historyExpression: String): Pair<String, Int> {
-        // Извлекаем систему счисления из скобок
         val baseRegex = "\\((.*)\\)".toRegex()
         val baseMatch = baseRegex.find(historyExpression)
-        var base = 10 // по умолчанию DEC
+        var base = 10
 
         baseMatch?.let { match ->
             val baseName = match.groupValues[1]
@@ -322,7 +308,6 @@ class ProgrammerFragment : Fragment() {
             }
         }
 
-        // Извлекаем чистое выражение (убираем систему счисления в скобках)
         val cleanExpression = historyExpression.replace("\\s*\\(.*\\)".toRegex(), "").trim()
 
         return Pair(cleanExpression, base)
@@ -352,7 +337,6 @@ class ProgrammerFragment : Fragment() {
             updateDisplay()
             convertAndDisplay()
 
-            // СОХРАНЯЕМ В ИСТОРИЮ
             saveToHistory(result)
 
         } catch (e: Exception) {
@@ -364,11 +348,9 @@ class ProgrammerFragment : Fragment() {
     private fun saveToHistory(result: String) {
         if (result != "Error" && result.isNotEmpty() && result != "NaN") {
             try {
-                // Проверяем, что результат можно преобразовать в число
                 result.toLongOrNull(currentBase)
                 val displayExpression = "${currentExpression} (${getBaseName(currentBase)})"
 
-                // Сохраняем в истории в фоновом потоке
                 CoroutineScope(Dispatchers.IO).launch {
                     repository.insertHistory(
                         expression = displayExpression,
@@ -402,13 +384,10 @@ class ProgrammerFragment : Fragment() {
 
     private fun evaluateProgrammerExpression(expression: String, base: Int): String {
         return try {
-            // Конвертируем все числа в выражении в десятичную систему для вычислений
             val decimalExpression = convertExpressionToDecimal(expression, base)
 
-            // Вычисляем выражение в десятичной системе
             val decimalResult = eval(decimalExpression)
 
-            // Конвертируем результат обратно в текущую систему
             decimalResult.toLong().toString(base).uppercase()
         } catch (e: Exception) {
             "Error"
@@ -421,9 +400,7 @@ class ProgrammerFragment : Fragment() {
 
         for (char in expression) {
             if (char in "+-*/()") {
-                // Если встречаем оператор или скобку, добавляем текущее число (если есть) и оператор
                 if (currentNumber.isNotEmpty()) {
-                    // Конвертируем число из текущей системы в десятичную
                     val number = currentNumber.toString().toLongOrNull(base)
                     if (number == null) throw RuntimeException("Invalid number: ${currentNumber}")
                     result.append(number.toString())
@@ -431,12 +408,10 @@ class ProgrammerFragment : Fragment() {
                 }
                 result.append(char)
             } else {
-                // Добавляем цифру к текущему числу
                 currentNumber.append(char)
             }
         }
 
-        // Добавляем последнее число
         if (currentNumber.isNotEmpty()) {
             val number = currentNumber.toString().toLongOrNull(base)
             if (number == null) throw RuntimeException("Invalid number: ${currentNumber}")
@@ -446,7 +421,6 @@ class ProgrammerFragment : Fragment() {
         return result.toString()
     }
 
-    // Используем тот же eval метод что и в обычном калькуляторе
     private fun eval(expression: String): Double {
         return object : Any() {
             var pos = -1

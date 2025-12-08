@@ -17,7 +17,7 @@ class CalculatorFragment : Fragment() {
 
     private var currentExpression = "0"
     private var currentResult = "0"
-    private var isFromHistory = false  // <-- Переместил сюда
+    private var isFromHistory = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,19 +28,15 @@ class CalculatorFragment : Fragment() {
         return binding.root
     }
 
-    // Добавьте эту переменную в класс
     private var wasFromHistory = false
 
-    // В методе onViewCreated добавьте в начало:
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Получаем флаг fromHistory
         val fromHistory = arguments?.getBoolean("fromHistory", false) ?: false
         wasFromHistory = fromHistory
         val expressionFromHistory = arguments?.getString("expressionFromHistory")
 
-        // Обрабатываем выражение из истории ТОЛЬКО если был переход из истории
         if (fromHistory && !expressionFromHistory.isNullOrEmpty()) {
             currentExpression = expressionFromHistory
             isFromHistory = true
@@ -61,7 +57,7 @@ class CalculatorFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Numbers
+        // Цифры
         binding.button0.setOnClickListener { appendNumber("0") }
         binding.button1.setOnClickListener { appendNumber("1") }
         binding.button2.setOnClickListener { appendNumber("2") }
@@ -73,13 +69,13 @@ class CalculatorFragment : Fragment() {
         binding.button8.setOnClickListener { appendNumber("8") }
         binding.button9.setOnClickListener { appendNumber("9") }
 
-        // Basic Operations
+        // Базовые операции
         binding.buttonAdd.setOnClickListener { appendOperation("+") }
         binding.buttonSubtract.setOnClickListener { appendOperation("-") }
         binding.buttonMultiply.setOnClickListener { appendOperation("*") }
         binding.buttonDivide.setOnClickListener { appendOperation("/") }
 
-        // Functions
+        // Функции
         binding.buttonDecimal.setOnClickListener { appendDecimal() }
         binding.buttonOpenBracket.setOnClickListener { appendOperation("(") }
         binding.buttonCloseBracket.setOnClickListener { appendOperation(")") }
@@ -87,7 +83,7 @@ class CalculatorFragment : Fragment() {
         binding.buttonEquals.setOnClickListener { calculate() }
         binding.buttonDelete.setOnClickListener { deleteLast() }
 
-        // Scientific Functions
+        // Функции sin, cos, tg,..
         binding.buttonSin.setOnClickListener { appendTrigFunction("sin(") }
         binding.buttonCos.setOnClickListener { appendTrigFunction("cos(") }
         binding.buttonTan.setOnClickListener { appendTrigFunction("tan(") }

@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mathmaster.R
@@ -75,7 +74,6 @@ class HistoryFragment : Fragment() {
                     putString("expressionFromHistory", history.expression)
                     putBoolean("fromHistory", true)
                 }
-                // Без NavOptions - стандартная навигация
                 navController.navigate(R.id.calculatorFragment, bundle)
             }
             "programmer" -> {
