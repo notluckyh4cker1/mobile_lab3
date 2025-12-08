@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="?attr/colorSurface"
     android:padding="8dp">
 
     <!-- Display Area -->
@@ -11,9 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#f5f5f5"
+        android:background="?attr/colorSurfaceVariant"
         android:padding="12dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="8dp"
+        app:cornerRadius="12dp">
 
         <!-- Expression Display -->
         <TextView
@@ -21,18 +23,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="0"
-            android:textSize="16sp"
-            android:textColor="#333" />
-
-        <!-- Current Base -->
-        <TextView
-            android:id="@+id/baseDisplay"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="DEC"
             android:textSize="14sp"
-            android:textColor="#666"
-            android:layout_marginTop="4dp" />
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
         <!-- Result Display -->
         <TextView
@@ -40,8 +32,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="0"
-            android:textSize="20sp"
-            android:textColor="#000"
+            android:textSize="22sp"
+            android:textColor="?attr/colorOnSurface"
             android:textStyle="bold"
             android:layout_marginTop="4dp" />
 
@@ -51,33 +43,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="HEX: 0"
-            android:textSize="12sp"
-            android:textColor="#333"
-            android:layout_marginTop="8dp" />
+            android:textSize="11sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginTop="6dp" />
 
         <TextView
             android:id="@+id/textDecResult"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="DEC: 0"
-            android:textSize="12sp"
-            android:textColor="#333" />
+            android:textSize="11sp"
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
         <TextView
             android:id="@+id/textOctResult"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="OCT: 0"
-            android:textSize="12sp"
-            android:textColor="#333" />
+            android:textSize="11sp"
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
         <TextView
             android:id="@+id/textBinResult"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="BIN: 0"
-            android:textSize="12sp"
-            android:textColor="#333" />
+            android:textSize="11sp"
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
     </LinearLayout>
 
@@ -87,59 +79,71 @@
         android:layout_height="wrap_content"
         android:columnCount="4"
         android:rowCount="1"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="8dp"
+        android:columnOrderPreserved="false">
 
         <Button
             android:id="@+id/buttonHex"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="36dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="HEX"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textAllCaps="false"
+            style="@style/Button.Calculator.Number" />
 
         <Button
             android:id="@+id/buttonDec"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="36dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="DEC"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textAllCaps="false"
+            style="@style/Button.Calculator.Operation" />
 
         <Button
             android:id="@+id/buttonOct"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="36dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="OCT"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textAllCaps="false"
+            style="@style/Button.Calculator.Number" />
 
         <Button
             android:id="@+id/buttonBin"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="36dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="BIN"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textAllCaps="false"
+            style="@style/Button.Calculator.Number" />
 
     </GridLayout>
 
-    <!-- Calculator Buttons -->
+    <!-- Calculator Buttons - КОМПАКТНАЯ ВЕРСИЯ -->
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:columnCount="5"
-        android:rowCount="5">
+        android:rowCount="5"
+        android:columnOrderPreserved="false"
+        android:layout_marginBottom="4dp">
 
-        <!-- Row 1 -->
+        <!-- Row 1: 7 8 9 / ⌫ -->
         <Button
             android:id="@+id/button7"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="7"
@@ -147,8 +151,9 @@
 
         <Button
             android:id="@+id/button8"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="8"
@@ -156,8 +161,9 @@
 
         <Button
             android:id="@+id/button9"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="9"
@@ -165,8 +171,9 @@
 
         <Button
             android:id="@+id/buttonDivide"
+            style="@style/Button.Calculator.Operation"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="/"
@@ -174,19 +181,20 @@
 
         <Button
             android:id="@+id/buttonDelete"
+            style="@style/Button.Calculator.Operation"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="⌫"
-            android:textSize="16sp"
-            android:background="#ff6b6b" />
+            android:textSize="16sp" />
 
-        <!-- Row 2 -->
+        <!-- Row 2: 4 5 6 * C -->
         <Button
             android:id="@+id/button4"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="4"
@@ -194,8 +202,9 @@
 
         <Button
             android:id="@+id/button5"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="5"
@@ -203,8 +212,9 @@
 
         <Button
             android:id="@+id/button6"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="6"
@@ -212,27 +222,30 @@
 
         <Button
             android:id="@+id/buttonMultiply"
+            style="@style/Button.Calculator.Operation"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="*"
             android:textSize="16sp" />
 
         <Button
-            android:id="@+id/buttonOpenBracket"
+            android:id="@+id/buttonClear"
+            style="@style/Button.Calculator.Operation"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
-            android:text="("
+            android:text="C"
             android:textSize="16sp" />
 
-        <!-- Row 3 -->
+        <!-- Row 3: 1 2 3 - + -->
         <Button
             android:id="@+id/button1"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="1"
@@ -240,8 +253,9 @@
 
         <Button
             android:id="@+id/button2"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="2"
@@ -249,8 +263,9 @@
 
         <Button
             android:id="@+id/button3"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="3"
@@ -258,27 +273,30 @@
 
         <Button
             android:id="@+id/buttonSubtract"
+            style="@style/Button.Calculator.Operation"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="-"
             android:textSize="16sp" />
 
         <Button
-            android:id="@+id/buttonCloseBracket"
+            android:id="@+id/buttonAdd"
+            style="@style/Button.Calculator.Operation"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
-            android:text=")"
+            android:text="+"
             android:textSize="16sp" />
 
-        <!-- Row 4 -->
+        <!-- Row 4: 0 A B C ( -->
         <Button
             android:id="@+id/button0"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="0"
@@ -286,8 +304,9 @@
 
         <Button
             android:id="@+id/buttonA"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="A"
@@ -295,8 +314,9 @@
 
         <Button
             android:id="@+id/buttonB"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="B"
@@ -304,27 +324,30 @@
 
         <Button
             android:id="@+id/buttonC"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="C"
             android:textSize="16sp" />
 
         <Button
-            android:id="@+id/buttonAdd"
+            android:id="@+id/buttonOpenBracket"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
-            android:text="+"
+            android:text="("
             android:textSize="16sp" />
 
-        <!-- Row 5 -->
+        <!-- Row 5: D E F = ) -->
         <Button
             android:id="@+id/buttonD"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="D"
@@ -332,8 +355,9 @@
 
         <Button
             android:id="@+id/buttonE"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="E"
@@ -341,8 +365,9 @@
 
         <Button
             android:id="@+id/buttonF"
+            style="@style/Button.Calculator.Number"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="60dp"
             android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="F"
@@ -350,14 +375,23 @@
 
         <Button
             android:id="@+id/buttonEquals"
+            style="@style/Button.Calculator.Equals"
             android:layout_width="0dp"
-            android:layout_height="65dp"
-            android:layout_columnWeight="2"
-            android:layout_columnSpan="2"
+            android:layout_height="60dp"
+            android:layout_columnWeight="1"
             android:layout_margin="2dp"
             android:text="="
-            android:textSize="16sp"
-            android:background="#4ecdc4" />
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/buttonCloseBracket"
+            style="@style/Button.Calculator.Number"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="2dp"
+            android:text=")"
+            android:textSize="16sp" />
 
     </GridLayout>
 

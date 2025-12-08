@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.mathmaster.databinding.FragmentProgrammerBinding
 import com.example.mathmaster.database.AppDatabase
 import com.example.mathmaster.repository.CalculatorRepository
-import com.example.mathmaster.ui.history.HistoryViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ProgrammerFragment : Fragment() {
 
@@ -20,6 +23,10 @@ class ProgrammerFragment : Fragment() {
     private var currentResult = "0"
     private var currentBase = 10 // DEC по умолчанию
 
+    // Для сохранения в историю
+    private lateinit var repository: CalculatorRepository
+    private var isFromHistory = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -29,21 +36,23 @@ class ProgrammerFragment : Fragment() {
         return binding.root
     }
 
-    private lateinit var historyViewModel: HistoryViewModel
-    private var isFromHistory = false
-    private var shouldSaveToHistory = true
+    private var wasFromHistory = false
 
+    // В методе onViewCreated измените начало:
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Инициализация ViewModel для истории
+        // Инициализируем репозиторий для истории
         val database = AppDatabase.getDatabase(requireContext())
-        val repository = CalculatorRepository(database.calculationHistoryDao())
-        historyViewModel = HistoryViewModel(repository)
+        repository = CalculatorRepository(database.calculationHistoryDao())
 
-        // ПРОВЕРЯЕМ ПЕРЕДАННОЕ ВЫРАЖЕНИЕ ИЗ ИСТОРИИ
+        // Получаем флаг fromHistory
+        val fromHistory = arguments?.getBoolean("fromHistory", false) ?: false
+        wasFromHistory = fromHistory
         val expressionFromHistory = arguments?.getString("expressionFromHistory")
-        if (!expressionFromHistory.isNullOrEmpty()) {
+
+        // ПРОВЕРЯЕМ ПЕРЕДАННОЕ ВЫРАЖЕНИЕ ИЗ ИСТОРИИ ТОЛЬКО ЕСЛИ ФЛАГ УСТАНОВЛЕН
+        if (fromHistory && !expressionFromHistory.isNullOrEmpty()) {
             // ИЗВЛЕКАЕМ СИСТЕМУ СЧИСЛЕНИЯ И ВЫРАЖЕНИЕ
             val (cleanExpression, base) = extractExpressionAndBaseFromHistory(expressionFromHistory)
             currentInput = cleanExpression
@@ -57,6 +66,16 @@ class ProgrammerFragment : Fragment() {
         setupClickListeners()
         updateDisplay()
         updateButtonAvailability()
+        updateBaseButtonHighlight()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (wasFromHistory) {
+            wasFromHistory = false
+            arguments?.clear()
+        }
     }
 
     private fun setupClickListeners() {
@@ -81,10 +100,22 @@ class ProgrammerFragment : Fragment() {
         binding.buttonF.setOnClickListener { appendDigit("F") }
 
         // Системы счисления
-        binding.buttonHex.setOnClickListener { changeBase(16) }
-        binding.buttonDec.setOnClickListener { changeBase(10) }
-        binding.buttonOct.setOnClickListener { changeBase(8) }
-        binding.buttonBin.setOnClickListener { changeBase(2) }
+        binding.buttonHex.setOnClickListener {
+            changeBase(16)
+            updateBaseButtonHighlight()
+        }
+        binding.buttonDec.setOnClickListener {
+            changeBase(10)
+            updateBaseButtonHighlight()
+        }
+        binding.buttonOct.setOnClickListener {
+            changeBase(8)
+            updateBaseButtonHighlight()
+        }
+        binding.buttonBin.setOnClickListener {
+            changeBase(2)
+            updateBaseButtonHighlight()
+        }
 
         // Операции
         binding.buttonDelete.setOnClickListener { deleteLast() }
@@ -95,6 +126,62 @@ class ProgrammerFragment : Fragment() {
         binding.buttonEquals.setOnClickListener { calculate() }
         binding.buttonOpenBracket.setOnClickListener { appendOperation("(") }
         binding.buttonCloseBracket.setOnClickListener { appendOperation(")") }
+        binding.buttonClear.setOnClickListener { clearAll() }
+    }
+
+    private fun updateBaseButtonHighlight() {
+        // Определяем, темная ли тема
+        val isDarkTheme = isDarkTheme()
+
+        // Цвета для текста в зависимости от темы
+        val unselectedTextColor = if (isDarkTheme) {
+            ContextCompat.getColor(requireContext(), android.R.color.white)
+        } else {
+            ContextCompat.getColor(requireContext(), android.R.color.black)
+        }
+
+        val selectedBgColor = ContextCompat.getColor(requireContext(), android.R.color.holo_blue_light)
+        val selectedTextColor = ContextCompat.getColor(requireContext(), android.R.color.white)
+        val defaultBgColor = ContextCompat.getColor(requireContext(), android.R.color.transparent)
+
+        // Сбрасываем все кнопки систем счисления
+        binding.buttonHex.setBackgroundColor(defaultBgColor)
+        binding.buttonHex.setTextColor(unselectedTextColor)
+
+        binding.buttonDec.setBackgroundColor(defaultBgColor)
+        binding.buttonDec.setTextColor(unselectedTextColor)
+
+        binding.buttonOct.setBackgroundColor(defaultBgColor)
+        binding.buttonOct.setTextColor(unselectedTextColor)
+
+        binding.buttonBin.setBackgroundColor(defaultBgColor)
+        binding.buttonBin.setTextColor(unselectedTextColor)
+
+        // Подсвечиваем активную кнопку
+        when (currentBase) {
+            16 -> {
+                binding.buttonHex.setBackgroundColor(selectedBgColor)
+                binding.buttonHex.setTextColor(selectedTextColor)
+            }
+            10 -> {
+                binding.buttonDec.setBackgroundColor(selectedBgColor)
+                binding.buttonDec.setTextColor(selectedTextColor)
+            }
+            8 -> {
+                binding.buttonOct.setBackgroundColor(selectedBgColor)
+                binding.buttonOct.setTextColor(selectedTextColor)
+            }
+            2 -> {
+                binding.buttonBin.setBackgroundColor(selectedBgColor)
+                binding.buttonBin.setTextColor(selectedTextColor)
+            }
+        }
+    }
+
+    private fun isDarkTheme(): Boolean {
+        val configuration = resources.configuration
+        val currentNightMode = configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        return currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun appendDigit(digit: String) {
@@ -107,7 +194,6 @@ class ProgrammerFragment : Fragment() {
             currentExpression += digit
         }
         currentResult = "0"
-        shouldSaveToHistory = true // РАЗРЕШАЕМ СОХРАНЕНИЕ ПРИ ЛЮБОМ ВВОДЕ
         updateDisplay()
         convertAndDisplay()
     }
@@ -122,6 +208,7 @@ class ProgrammerFragment : Fragment() {
     private fun changeBase(newBase: Int) {
         if (currentBase != newBase) {
             try {
+                // Конвертируем текущее число в новую систему счисления
                 val number = currentInput.toLongOrNull(currentBase) ?: 0
                 currentInput = when (newBase) {
                     2 -> number.toString(2)
@@ -161,10 +248,11 @@ class ProgrammerFragment : Fragment() {
     }
 
     private fun updateButtonAvailability() {
-        // Включаем/выключаем кнопки в зависимости от системы счисления
+        // Обновляем доступность и прозрачность кнопок
         val digits = listOf(
-            binding.button2, binding.button3, binding.button4, binding.button5,
-            binding.button6, binding.button7, binding.button8, binding.button9
+            binding.button0, binding.button1, binding.button2, binding.button3,
+            binding.button4, binding.button5, binding.button6, binding.button7,
+            binding.button8, binding.button9
         )
 
         val hexDigits = listOf(
@@ -174,22 +262,46 @@ class ProgrammerFragment : Fragment() {
 
         when (currentBase) {
             2 -> { // BIN - только 0-1
-                digits.forEach { it.isEnabled = false }
-                hexDigits.forEach { it.isEnabled = false }
+                digits.forEachIndexed { index, button ->
+                    val isEnabled = index <= 1 // 0-1
+                    button.isEnabled = isEnabled
+                    button.alpha = if (isEnabled) 1f else 0.3f
+                }
+                hexDigits.forEach { button ->
+                    button.isEnabled = false
+                    button.alpha = 0.3f
+                }
             }
             8 -> { // OCT - только 0-7
                 digits.forEachIndexed { index, button ->
-                    button.isEnabled = index < 6 // 2-7
+                    val isEnabled = index <= 7 // 0-7
+                    button.isEnabled = isEnabled
+                    button.alpha = if (isEnabled) 1f else 0.3f
                 }
-                hexDigits.forEach { it.isEnabled = false }
+                hexDigits.forEach { button ->
+                    button.isEnabled = false
+                    button.alpha = 0.3f
+                }
             }
             10 -> { // DEC - только 0-9
-                digits.forEach { it.isEnabled = true }
-                hexDigits.forEach { it.isEnabled = false }
+                digits.forEach { button ->
+                    button.isEnabled = true
+                    button.alpha = 1f
+                }
+                hexDigits.forEach { button ->
+                    button.isEnabled = false
+                    button.alpha = 0.3f
+                }
             }
             16 -> { // HEX - 0-9, A-F
-                digits.forEach { it.isEnabled = true }
-                hexDigits.forEach { it.isEnabled = true }
+                digits.forEach { button ->
+                    button.isEnabled = true
+                    button.alpha = 1f
+                }
+                hexDigits.forEach { button ->
+                    button.isEnabled = true
+                    button.alpha = 1f
+                }
             }
         }
     }
@@ -220,9 +332,8 @@ class ProgrammerFragment : Fragment() {
         try {
             val result = evaluateProgrammerExpression(currentInput, currentBase)
             currentResult = result
-            currentInput = result // ПОДСТАВЛЯЕМ РЕЗУЛЬТАТ В КАЧЕСТВЕ ТЕКУЩЕГО ВВОДА
-            currentExpression = currentInput // ОБНОВЛЯЕМ ВЫРАЖЕНИЕ ДЛЯ ОТОБРАЖЕНИЯ
-            shouldSaveToHistory = false // НЕ СОХРАНЯЕМ ПЕРВОЕ ВЫЧИСЛЕНИЕ
+            currentInput = result
+            currentExpression = currentInput
 
             updateDisplay()
             convertAndDisplay()
@@ -230,12 +341,7 @@ class ProgrammerFragment : Fragment() {
             currentResult = "Error"
             currentInput = "Error"
             updateDisplay()
-            shouldSaveToHistory = true
         }
-    }
-
-    private fun calculateFromHistory() {
-        calculateAndSetResultFromHistory() // ИСПОЛЬЗУЕМ ОДИН МЕТОД
     }
 
     private fun calculate() {
@@ -246,30 +352,42 @@ class ProgrammerFragment : Fragment() {
             updateDisplay()
             convertAndDisplay()
 
-            // СОХРАНЯЕМ ТОЛЬКО ЕСЛИ РАЗРЕШЕНО
-            if (result != "Error" && result.isNotEmpty() && result != "NaN" && shouldSaveToHistory) {
-                try {
-                    result.toLongOrNull(currentBase)
-                    val displayExpression = "${currentExpression} (${getBaseName(currentBase)})"
-
-                    historyViewModel.saveCalculation(
-                        expression = displayExpression,
-                        result = result,
-                        calculatorType = "programmer"
-                    )
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            } else {
-                // РАЗРЕШАЕМ СОХРАНЕНИЕ ДЛЯ СЛЕДУЮЩИХ ВЫЧИСЛЕНИЙ
-                shouldSaveToHistory = true
-            }
+            // СОХРАНЯЕМ В ИСТОРИЮ
+            saveToHistory(result)
 
         } catch (e: Exception) {
             currentInput = "Error"
             updateDisplay()
-            shouldSaveToHistory = true
         }
+    }
+
+    private fun saveToHistory(result: String) {
+        if (result != "Error" && result.isNotEmpty() && result != "NaN") {
+            try {
+                // Проверяем, что результат можно преобразовать в число
+                result.toLongOrNull(currentBase)
+                val displayExpression = "${currentExpression} (${getBaseName(currentBase)})"
+
+                // Сохраняем в истории в фоновом потоке
+                CoroutineScope(Dispatchers.IO).launch {
+                    repository.insertHistory(
+                        expression = displayExpression,
+                        result = result,
+                        calculatorType = "programmer"
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun clearAll() {
+        currentInput = "0"
+        currentExpression = "0"
+        currentResult = "0"
+        updateDisplay()
+        convertAndDisplay()
     }
 
     private fun getBaseName(base: Int): String {
@@ -413,13 +531,6 @@ class ProgrammerFragment : Fragment() {
     private fun updateDisplay() {
         binding.expressionTextView.text = currentExpression
         binding.resultTextView.text = currentResult
-        binding.baseDisplay.text = when (currentBase) {
-            2 -> "BIN"
-            8 -> "OCT"
-            10 -> "DEC"
-            16 -> "HEX"
-            else -> "DEC"
-        }
     }
 
     override fun onDestroyView() {

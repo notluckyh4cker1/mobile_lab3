@@ -1,7 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.MathMaster" parent="Theme.Material3.DayNight">
-        <!-- Явно отключаем ActionBar -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
 
@@ -33,41 +32,54 @@
 
     <!-- Custom Toolbar Style -->
     <style name="Widget.MathMaster.Toolbar" parent="Widget.Material3.Toolbar">
-        <item name="backgroundTint">?attr/colorPrimary</item>
-        <item name="titleTextColor">?attr/colorOnPrimary</item>
+        <item name="backgroundTint">?attr/colorSurface</item>
+        <item name="titleTextColor">?attr/colorOnSurface</item>
+        <item name="navigationIconTint">?attr/colorOnSurface</item>
     </style>
 
     <!-- Calculator Button Styles -->
     <style name="Button.Calculator.Number" parent="Widget.Material3.Button">
         <item name="backgroundTint">?attr/colorSurfaceVariant</item>
-        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
-        <item name="cornerRadius">24dp</item>
-        <item name="android:minHeight">64dp</item>
-        <item name="android:minWidth">64dp</item>
+        <item name="android:textColor">@color/calculator_text_light</item>
     </style>
 
     <style name="Button.Calculator.Operation" parent="Widget.Material3.Button">
         <item name="backgroundTint">?attr/colorPrimary</item>
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-        <item name="cornerRadius">24dp</item>
-        <item name="android:minHeight">64dp</item>
-        <item name="android:minWidth">64dp</item>
+        <item name="android:textColor">@color/calculator_text_light</item>
     </style>
 
     <style name="Button.Calculator.Function" parent="Widget.Material3.Button">
         <item name="backgroundTint">?attr/colorSurfaceVariant</item>
-        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
-        <item name="cornerRadius">24dp</item>
-        <item name="android:minHeight">64dp</item>
-        <item name="android:minWidth">64dp</item>
+        <item name="android:textColor">@color/calculator_text_light</item>
     </style>
 
     <style name="Button.Calculator.Equals" parent="Widget.Material3.Button">
         <item name="backgroundTint">?attr/colorSecondary</item>
-        <item name="android:textColor">?attr/colorOnSecondary</item>
-        <item name="cornerRadius">24dp</item>
-        <item name="android:minHeight">64dp</item>
-        <item name="android:minWidth">64dp</item>
-        <item name="elevation">4dp</item>
+        <item name="android:textColor">@color/calculator_text_light</item>
+    </style>
+
+    <!-- Material Button Styles -->
+    <style name="Button.Primary" parent="Widget.Material3.Button">
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <!-- TextInputLayout Style -->
+    <style name="Widget.MathMaster.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">?attr/colorPrimary</item>
+        <item name="hintTextColor">?attr/colorOnSurfaceVariant</item>
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
     </style>
 </resources>

@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.mathmaster.database.AppDatabase
 import com.example.mathmaster.repository.CalculatorRepository
-import com.example.mathmaster.ui.history.HistoryViewModel
 import com.example.mathmaster.databinding.FragmentCalculatorBinding
 import kotlin.math.*
 
@@ -17,6 +17,7 @@ class CalculatorFragment : Fragment() {
 
     private var currentExpression = "0"
     private var currentResult = "0"
+    private var isFromHistory = false  // <-- Переместил сюда
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,18 +28,20 @@ class CalculatorFragment : Fragment() {
         return binding.root
     }
 
-    private lateinit var historyViewModel: HistoryViewModel
-    private var isFromHistory = false
+    // Добавьте эту переменную в класс
+    private var wasFromHistory = false
 
+    // В методе onViewCreated добавьте в начало:
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val database = AppDatabase.getDatabase(requireContext())
-        val repository = CalculatorRepository(database.calculationHistoryDao())
-        historyViewModel = HistoryViewModel(repository)
-
+        // Получаем флаг fromHistory
+        val fromHistory = arguments?.getBoolean("fromHistory", false) ?: false
+        wasFromHistory = fromHistory
         val expressionFromHistory = arguments?.getString("expressionFromHistory")
-        if (!expressionFromHistory.isNullOrEmpty()) {
+
+        // Обрабатываем выражение из истории ТОЛЬКО если был переход из истории
+        if (fromHistory && !expressionFromHistory.isNullOrEmpty()) {
             currentExpression = expressionFromHistory
             isFromHistory = true
             calculateFromHistory()
@@ -46,6 +49,15 @@ class CalculatorFragment : Fragment() {
 
         setupClickListeners()
         updateDisplay()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (wasFromHistory) {
+            wasFromHistory = false
+            arguments?.clear()
+        }
     }
 
     private fun setupClickListeners() {
@@ -156,6 +168,14 @@ class CalculatorFragment : Fragment() {
         }
     }
 
+    private fun saveToHistory(expression: String, result: String, type: String) {
+        viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+            val database = AppDatabase.getDatabase(requireContext())
+            val repository = CalculatorRepository(database.calculationHistoryDao())
+            repository.insertHistory(expression, result, type)
+        }
+    }
+
     private fun calculate() {
         try {
             val result = evaluateExpression(currentExpression)
@@ -163,11 +183,7 @@ class CalculatorFragment : Fragment() {
             updateDisplay()
 
             if (result != "Error") {
-                historyViewModel.saveCalculation(
-                    expression = currentExpression,
-                    result = result,
-                    calculatorType = "engineering"
-                )
+                saveToHistory(currentExpression, result, "engineering")
             }
 
         } catch (e: Exception) {
